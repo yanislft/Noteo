@@ -32,6 +32,7 @@ class VerifyEmailNotification extends VerifyEmail
             ->line('Cliquez sur le bouton ci-dessous pour confirmer votre adresse email et activer votre compte Noteo.')
             ->action('Confirmer mon email', $verificationUrl)
             ->line('Ce lien expire dans 60 minutes.')
-            ->line('Si vous n\'avez pas créé de compte, ignorez cet email.');
+            ->line('Si vous n\'avez pas créé de compte, ignorez cet email.')
+            ->salutation('Cordialement, l\'équipe Noteo');
     }
 }

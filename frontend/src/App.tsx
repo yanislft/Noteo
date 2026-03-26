@@ -9,18 +9,21 @@ import Dashboard from './pages/Dashboard';
 import VerifyEmail from './pages/VerifyEmail';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { token, user } = useAuthStore();
+  const { token, user, hydrated } = useAuthStore();
+  if (!hydrated) return null;
   if (!token) return <Navigate to="/login" />;
   if (user && !user.email_verified_at) return <Navigate to="/verify-email" />;
   return <>{children}</>;
 };
 
 function App() {
-  const { token, user, setUser, clearAuth } = useAuthStore();
+  const { token, user, setUser, setHydrated, clearAuth } = useAuthStore();
 
   useEffect(() => {
     if (token && !user) {
-      me().then(setUser).catch(clearAuth);
+      me().then(setUser).catch(clearAuth).finally(setHydrated);
+    } else {
+      setHydrated();
     }
   }, []);
 

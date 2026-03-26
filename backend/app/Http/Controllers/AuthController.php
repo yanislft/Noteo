@@ -42,13 +42,13 @@ class AuthController extends Controller
         $frontendUrl = config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:5173'));
 
         if ($user->hasVerifiedEmail()) {
-            return redirect($frontendUrl . '/dashboard?verified=already');
+            return redirect($frontendUrl . '/login?verified=already');
         }
 
         $user->markEmailAsVerified();
         event(new Verified($user));
 
-        return redirect($frontendUrl . '/dashboard?verified=1');
+        return redirect($frontendUrl . '/login?verified=1');
     }
 
     public function resendVerification(Request $request)
@@ -57,17 +57,14 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
-            return response()->json(['message' => 'Aucun compte trouvé avec cet email.'], 404);
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email déjà vérifié.'], 400);
+        if (!$user || $user->hasVerifiedEmail()) {
+            // Always return 200 to avoid email enumeration
+            return response()->json(['message' => 'Si un compte non vérifié existe pour cet email, un lien a été envoyé.']);
         }
 
         $user->sendEmailVerificationNotification();
 
-        return response()->json(['message' => 'Email de vérification renvoyé.']);
+        return response()->json(['message' => 'Si un compte non vérifié existe pour cet email, un lien a été envoyé.']);
     }
 
     public function login(Request $request)

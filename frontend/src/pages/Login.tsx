@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate, Link, Navigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { login } from '../api/auth';
 import { useAuthStore } from '../store/authStore';
@@ -7,6 +7,8 @@ import { useAuthStore } from '../store/authStore';
 export default function Login() {
   const navigate = useNavigate();
   const { token, setAuth } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const verified = searchParams.get('verified');
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -52,6 +54,13 @@ export default function Login() {
             <div className="text-center mb-10">
               <h1 className="font-cursive text-4xl text-primary mb-2">Content de vous revoir</h1>
             </div>
+
+            {verified === '1' && (
+              <div className="mb-6 px-4 py-3 bg-primary/10 text-primary rounded-sm text-sm flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">check_circle</span>
+                Email confirmé ! Vous pouvez maintenant vous connecter.
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 px-4 py-3 bg-error-container text-on-error-container rounded-sm text-sm">
