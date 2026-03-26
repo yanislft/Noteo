@@ -30,6 +30,21 @@ export const me = async () => {
   return response.data;
 };
 
+export const forgotPassword = async (email: string) => {
+  const response = await api.post('/auth/password/forgot', { email });
+  return response.data;
+};
+
+export const resetPassword = async (data: {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}) => {
+  const response = await api.post('/auth/password/reset', data);
+  return response.data;
+};
+
 export const updateProfile = async (data: {
   name: string;
   firstname: string;

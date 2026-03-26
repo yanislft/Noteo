@@ -61,6 +61,12 @@ export default function Login() {
                 Email confirmé ! Vous pouvez maintenant vous connecter.
               </div>
             )}
+            {searchParams.get('reset') === '1' && (
+              <div className="mb-6 px-4 py-3 bg-primary/10 text-primary rounded-sm text-sm flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">check_circle</span>
+                Mot de passe réinitialisé ! Connectez-vous avec votre nouveau mot de passe.
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 px-4 py-3 bg-error-container text-on-error-container rounded-sm text-sm">
@@ -122,9 +128,9 @@ export default function Login() {
                   <input type="checkbox" className="w-4 h-4 rounded border-outline-variant accent-primary" />
                   <span className="text-on-surface-variant group-hover:text-primary transition-colors">Rester connecté</span>
                 </label>
-                <a href="#" className="text-secondary font-semibold hover:underline decoration-dotted underline-offset-4">
+                <Link to="/forgot-password" className="text-secondary font-semibold hover:underline decoration-dotted underline-offset-4">
                   Mot de passe oublié ?
-                </a>
+                </Link>
               </div>
 
               {/* Submit */}
