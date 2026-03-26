@@ -3,6 +3,7 @@ export interface User {
   name: string;
   firstname: string;
   email: string;
+  email_verified_at: string | null;
 }
 
 export interface Year {

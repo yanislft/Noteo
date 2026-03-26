@@ -6,7 +6,7 @@ import { useAuthStore } from '../store/authStore';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { token, setAuth } = useAuthStore();
+  const { token } = useAuthStore();
   const [form, setForm] = useState({ name: '', firstname: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,9 +17,8 @@ export default function Register() {
     e.preventDefault();
     setError('');
     try {
-      const data = await register(form);
-      setAuth(data.user, data.token);
-      navigate('/dashboard');
+      await register(form);
+      navigate('/verify-email', { state: { email: form.email } });
     } catch {
       setError("Une erreur est survenue lors de l'inscription");
     }

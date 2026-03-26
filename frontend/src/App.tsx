@@ -6,10 +6,13 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import VerifyEmail from './pages/VerifyEmail';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = useAuthStore((state) => state.token);
-  return token ? <>{children}</> : <Navigate to="/login" />;
+  const { token, user } = useAuthStore();
+  if (!token) return <Navigate to="/login" />;
+  if (user && !user.email_verified_at) return <Navigate to="/verify-email" />;
+  return <>{children}</>;
 };
 
 function App() {
@@ -27,6 +30,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/dashboard" element={
           <PrivateRoute>
             <Dashboard />

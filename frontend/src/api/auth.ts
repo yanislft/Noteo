@@ -7,7 +7,12 @@ export const register = async (data: {
   email: string;
   password: string;
 }) => {
-  const response = await api.post<{ token: string; user: User }>('/auth/register', data);
+  const response = await api.post<{ message: string; user: User }>('/auth/register', data);
+  return response.data;
+};
+
+export const resendVerification = async (email: string) => {
+  const response = await api.post('/auth/email/resend', { email });
   return response.data;
 };
 

@@ -19,7 +19,11 @@ export default function Login() {
     try {
       const data = await login(form);
       setAuth(data.user, data.token);
-      navigate('/dashboard');
+      if (!data.user.email_verified_at) {
+        navigate('/verify-email', { state: { email: form.email } });
+      } else {
+        navigate('/dashboard');
+      }
     } catch {
       setError('Email ou mot de passe incorrect');
     }
