@@ -16,6 +16,7 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:api')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('auth/me', [AuthController::class, 'me']);
+    Route::put('auth/profile', [AuthController::class, 'update']);
 
     Route::get('years', [YearController::class, 'index']);
     Route::post('years', [YearController::class, 'store']);

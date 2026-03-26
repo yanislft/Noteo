@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { logout } from '../api/auth';
 
-type View = 'analytics' | 'management';
+type View = 'analytics' | 'management' | 'profile';
 
 interface SidebarProps {
   view: View;
@@ -75,17 +75,21 @@ export default function Sidebar({ view, onViewChange }: SidebarProps) {
         {/* Bottom section */}
         <div className="px-5 mt-auto space-y-4">
           {/* User card */}
-          <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10">
+          <button
+            onClick={() => onViewChange('profile')}
+            className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${view === 'profile' ? 'bg-white/20 border-white/20' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
+          >
             <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-sm font-bold text-on-primary-fixed-variant shrink-0">
               {initials}
             </div>
-            <div className="overflow-hidden">
+            <div className="overflow-hidden flex-1">
               <p className="text-white text-sm font-semibold truncate">
                 {user?.firstname} {user?.name}
               </p>
               <p className="text-white/40 text-[10px] truncate">{user?.email}</p>
             </div>
-          </div>
+            <span className="material-symbols-outlined text-white/40 text-base shrink-0">chevron_right</span>
+          </button>
 
           {/* Logout */}
           <button
@@ -123,6 +127,18 @@ export default function Sidebar({ view, onViewChange }: SidebarProps) {
             </button>
           );
         })}
+        <button
+          onClick={() => onViewChange('profile')}
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-colors ${view === 'profile' ? 'text-white' : 'text-white/50'}`}
+        >
+          <span
+            className="material-symbols-outlined text-2xl"
+            style={view === 'profile' ? { fontVariationSettings: "'FILL' 1" } : {}}
+          >
+            person
+          </span>
+          <span className="text-[10px] font-medium">Profil</span>
+        </button>
         <button
           onClick={handleLogout}
           className="flex-none flex flex-col items-center justify-center gap-1 py-3 px-5 text-white/50 hover:text-white transition-colors"

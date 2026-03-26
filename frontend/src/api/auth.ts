@@ -24,3 +24,15 @@ export const me = async () => {
   const response = await api.get<User>('/auth/me');
   return response.data;
 };
+
+export const updateProfile = async (data: {
+  name: string;
+  firstname: string;
+  email: string;
+  current_password?: string;
+  password?: string;
+  password_confirmation?: string;
+}) => {
+  const response = await api.put<User>('/auth/profile', data);
+  return response.data;
+};
