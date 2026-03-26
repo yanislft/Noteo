@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
+import { me } from './api/auth';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -11,6 +13,14 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  const { token, user, setUser, clearAuth } = useAuthStore();
+
+  useEffect(() => {
+    if (token && !user) {
+      me().then(setUser).catch(clearAuth);
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>

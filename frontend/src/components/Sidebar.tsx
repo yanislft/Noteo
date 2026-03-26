@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { logout } from '../api/auth';
 
@@ -90,6 +90,15 @@ export default function Sidebar({ view, onViewChange }: SidebarProps) {
             </div>
             <span className="material-symbols-outlined text-white/40 text-base shrink-0">chevron_right</span>
           </button>
+
+            {/* Home */}
+          <Link
+            to="/"
+            className="w-full flex items-center gap-3 px-2 py-2 text-sm text-white/50 hover:text-white transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">home</span>
+            Accueil
+          </Link>
 
           {/* Logout */}
           <button
