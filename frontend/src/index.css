@@ -1,1 +1,170 @@
 @import "tailwindcss";
+
+@theme {
+  /* ── Fonts ── */
+  --font-cursive: "Dancing Script", cursive;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  /* ── Border Radius ── */
+  --radius-sm:  0.75rem;   /* 12px — buttons, inputs */
+  --radius:     1rem;      /* 16px — DEFAULT */
+  --radius-lg:  2rem;      /* 32px — large cards */
+  --radius-xl:  3rem;      /* 48px — hero elements */
+
+  /* ── Colors ── */
+
+  /* Primary — Sage Green */
+  --color-primary:                   #316357;
+  --color-primary-container:         #4a7c6f;
+  --color-primary-fixed:             #b8edde;
+  --color-primary-fixed-dim:         #9dd1c2;
+  --color-on-primary:                #ffffff;
+  --color-on-primary-fixed:          #00201a;
+  --color-on-primary-fixed-variant:  #1b4f44;
+  --color-on-primary-container:      #e7fff6;
+  --color-surface-tint:              #35675b;
+  --color-inverse-primary:           #9dd1c2;
+
+  /* Secondary — Amber/Yellow */
+  --color-secondary:                   #745b00;
+  --color-secondary-container:         #fdcc22;
+  --color-secondary-fixed:             #ffe08b;
+  --color-secondary-fixed-dim:         #f0c110;
+  --color-on-secondary:                #ffffff;
+  --color-on-secondary-container:      #6e5700;
+  --color-on-secondary-fixed:          #241a00;
+  --color-on-secondary-fixed-variant:  #584400;
+
+  /* Tertiary — Coral/Red */
+  --color-tertiary:                   #a03629;
+  --color-tertiary-container:         #c04e3f;
+  --color-tertiary-fixed:             #ffdad5;
+  --color-tertiary-fixed-dim:         #ffb4a8;
+  --color-on-tertiary:                #ffffff;
+  --color-on-tertiary-container:      #fff8f7;
+  --color-on-tertiary-fixed:          #410000;
+  --color-on-tertiary-fixed-variant:  #852318;
+
+  /* Surfaces */
+  --color-background:                #fcf9f2;
+  --color-surface:                   #fcf9f2;
+  --color-surface-bright:            #fcf9f2;
+  --color-surface-dim:               #dcdad3;
+  --color-surface-container-lowest:  #ffffff;
+  --color-surface-container-low:     #f6f3ec;
+  --color-surface-container:         #f1eee7;
+  --color-surface-container-high:    #ebe8e1;
+  --color-surface-container-highest: #e5e2db;
+  --color-surface-variant:           #e5e2db;
+
+  /* On-surface */
+  --color-on-surface:          #1c1c18;
+  --color-on-background:       #1c1c18;
+  --color-on-surface-variant:  #404946;
+
+  /* Outline */
+  --color-outline:         #707975;
+  --color-outline-variant: #c0c8c4;
+
+  /* Inverse */
+  --color-inverse-surface:    #31312c;
+  --color-inverse-on-surface: #f3f0e9;
+
+  /* Error */
+  --color-error:              #ba1a1a;
+  --color-error-container:    #ffdad6;
+  --color-on-error:           #ffffff;
+  --color-on-error-container: #93000a;
+}
+
+/* ── Base ── */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+  }
+
+  .font-cursive {
+    font-family: var(--font-cursive);
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    font-size: inherit;
+    line-height: 1;
+    vertical-align: middle;
+    display: inline-block;
+  }
+}
+
+/* ── Custom Utilities ── */
+@layer utilities {
+  /* Subtle paper grain overlay on a positioned parent */
+  .paper-grain {
+    position: relative;
+  }
+  .paper-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Sketchy pencil underline */
+  .pencil-underline {
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 8C20 4 45 4 65 6C80 7 98 4 98 4' stroke='%23316357' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    background-size: 100% 8px;
+    padding-bottom: 6px;
+  }
+
+  /* Washi tape coral strip */
+  .washi-tape {
+    background-color: #e86b5a;
+    mask-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0L5 3L10 0L15 3L20 0L25 3L30 0L35 3L40 0L45 3L50 0L55 3L60 0L65 3L70 0L75 3L80 0L85 3L90 0L95 3L100 0V20L95 17L90 20L85 17L80 20L75 17L70 20L65 17L60 20L55 17L50 20L45 17L40 20L35 17L30 20L25 17L20 20L15 17L10 20L5 17L0 20V0Z'/%3E%3C/svg%3E");
+    mask-size: cover;
+  }
+
+  /* Gradient primary button */
+  .btn-primary {
+    background: linear-gradient(135deg, #316357, #4a7c6f);
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    transition: box-shadow 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 16px rgba(49, 99, 87, 0.3);
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  /* Secondary (yellow) button */
+  .btn-secondary {
+    background-color: #fdcc22;
+    color: #6e5700;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s, transform 0.15s;
+  }
+  .btn-secondary:hover {
+    background-color: #f0c110;
+  }
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
+  /* Card shadow (green-tinted ambient) */
+  .card-shadow {
+    box-shadow: 0 8px 32px rgba(74, 124, 111, 0.08);
+  }
+  .card-shadow-md {
+    box-shadow: 0 2px 16px rgba(74, 124, 111, 0.06);
+  }
+}

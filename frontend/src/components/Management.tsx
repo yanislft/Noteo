@@ -19,19 +19,16 @@ export default function Management() {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [input, setInput] = useState('');
   const [coeffInput, setCoeffInput] = useState('1');
+  const [gradeCoeff, setGradeCoeff] = useState('1');
 
   useEffect(() => {
-    if (view.level === 'years') {
-      getYears().then(setYears);
-    } else if (view.level === 'semesters') {
-      getSemesters(view.year.id).then(setSemesters);
-    } else if (view.level === 'subjects') {
-      getSubjects(view.semester.id).then(setSubjects);
-    } else if (view.level === 'grades') {
-      getGrades(view.subject.id).then(setGrades);
-    }
+    if (view.level === 'years') getYears().then(setYears);
+    else if (view.level === 'semesters') getSemesters(view.year.id).then(setSemesters);
+    else if (view.level === 'subjects') getSubjects(view.semester.id).then(setSubjects);
+    else if (view.level === 'grades') getGrades(view.subject.id).then(setGrades);
     setInput('');
     setCoeffInput('1');
+    setGradeCoeff('1');
   }, [view]);
 
   const handleAdd = async () => {
@@ -46,27 +43,19 @@ export default function Management() {
       const subject = await createSubject(view.semester.id, { name: input, coefficient: parseFloat(coeffInput) || 1 });
       setSubjects([...subjects, subject]);
     } else if (view.level === 'grades') {
-      const grade = await createGrade(view.subject.id, { name: input, value: parseFloat(coeffInput), coefficient: 1 });
+      const grade = await createGrade(view.subject.id, { name: input, value: parseFloat(coeffInput), coefficient: parseFloat(gradeCoeff) || 1 });
       setGrades([...grades, grade]);
     }
     setInput('');
     setCoeffInput('1');
+    setGradeCoeff('1');
   };
 
   const handleDelete = async (id: number) => {
-    if (view.level === 'years') {
-      await deleteYear(id);
-      setYears(years.filter((y) => y.id !== id));
-    } else if (view.level === 'semesters') {
-      await deleteSemester(id);
-      setSemesters(semesters.filter((s) => s.id !== id));
-    } else if (view.level === 'subjects') {
-      await deleteSubject(id);
-      setSubjects(subjects.filter((s) => s.id !== id));
-    } else if (view.level === 'grades') {
-      await deleteGrade(id);
-      setGrades(grades.filter((g) => g.id !== id));
-    }
+    if (view.level === 'years') { await deleteYear(id); setYears(years.filter((y) => y.id !== id)); }
+    else if (view.level === 'semesters') { await deleteSemester(id); setSemesters(semesters.filter((s) => s.id !== id)); }
+    else if (view.level === 'subjects') { await deleteSubject(id); setSubjects(subjects.filter((s) => s.id !== id)); }
+    else if (view.level === 'grades') { await deleteGrade(id); setGrades(grades.filter((g) => g.id !== id)); }
   };
 
   const breadcrumb = () => {
@@ -83,24 +72,15 @@ export default function Management() {
     return parts;
   };
 
-  const title = {
-    years: 'Années',
-    semesters: 'Semestres',
-    subjects: 'Matières',
-    grades: 'Notes',
-  }[view.level];
-
+  const title = { years: 'Années', semesters: 'Semestres', subjects: 'Matières', grades: 'Notes' }[view.level];
   const placeholder = {
-    years: 'Nom de l\'année (ex: 2024-2025)',
+    years: "Nom de l'année (ex: 2024-2025)",
     semesters: 'Nom du semestre (ex: Semestre 1)',
     subjects: 'Nom de la matière',
     grades: 'Nom de la note (ex: DS1)',
   }[view.level];
 
-  const items =
-    view.level === 'years' ? years :
-    view.level === 'semesters' ? semesters :
-    view.level === 'subjects' ? subjects : grades;
+  const items = view.level === 'years' ? years : view.level === 'semesters' ? semesters : view.level === 'subjects' ? subjects : grades;
 
   const handleItemClick = (item: Year | Semester | Subject | Grade) => {
     if (view.level === 'years') setView({ level: 'semesters', year: item as Year });
@@ -108,80 +88,145 @@ export default function Management() {
     else if (view.level === 'subjects') setView({ level: 'grades', year: (view as any).year, semester: (view as any).semester, subject: item as Subject });
   };
 
+  const levelIcon = { years: 'calendar_today', semesters: 'auto_awesome', subjects: 'book', grades: 'grade' }[view.level];
+  const isClickable = view.level !== 'grades';
+
   return (
-    <div>
+    <div className="space-y-8">
+      {/* Header */}
+      <header>
+        <h2 className="font-cursive text-5xl text-primary mb-1">Mes Notes</h2>
+        <p className="text-on-surface-variant text-sm">Gérez vos années, semestres, matières et notes.</p>
+      </header>
+
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-        <button onClick={() => setView({ level: 'years' })} className="hover:text-gray-700">Accueil</button>
+      <nav className="flex items-center gap-2 text-sm flex-wrap">
+        <button
+          onClick={() => setView({ level: 'years' })}
+          className="text-on-surface-variant hover:text-primary transition-colors font-medium"
+        >
+          Accueil
+        </button>
         {breadcrumb().map((b, i) => (
           <span key={i} className="flex items-center gap-2">
-            <span>/</span>
-            <button onClick={b.onClick} className="hover:text-gray-700">{b.label}</button>
+            <span className="material-symbols-outlined text-base text-outline">chevron_right</span>
+            <button onClick={b.onClick} className="text-on-surface-variant hover:text-primary transition-colors">
+              {b.label}
+            </button>
           </span>
         ))}
-        <span>/</span>
-        <span className="text-gray-700 font-medium">{title}</span>
-      </div>
+        <span className="material-symbols-outlined text-base text-outline">chevron_right</span>
+        <span className="text-on-surface font-semibold">{title}</span>
+      </nav>
 
-      {/* Formulaire d'ajout */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          placeholder={placeholder}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-        />
-        {(view.level === 'subjects') && (
+      {/* Add form */}
+      <div className="bg-surface-container-lowest rounded-lg card-shadow p-6">
+        <h3 className="font-semibold text-sm text-on-surface mb-4 flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary text-lg">add_circle</span>
+          Ajouter {view.level === 'years' ? 'une année' : view.level === 'semesters' ? 'un semestre' : view.level === 'subjects' ? 'une matière' : 'une note'}
+        </h3>
+        <div className="flex gap-2 flex-wrap">
           <input
-            type="number"
-            placeholder="Coeff"
-            value={coeffInput}
-            onChange={(e) => setCoeffInput(e.target.value)}
-            min="0"
-            className="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            type="text"
+            placeholder={placeholder}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+            className="flex-1 min-w-48 bg-surface-container-low border border-outline-variant/20 rounded-sm px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors"
           />
-        )}
-        {(view.level === 'grades') && (
-          <input
-            type="number"
-            placeholder="Note /20"
-            value={coeffInput}
-            onChange={(e) => setCoeffInput(e.target.value)}
-            min="0"
-            max="20"
-            className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
-        )}
-        <button
-          onClick={handleAdd}
-          className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700"
-        >
-          Ajouter
-        </button>
-      </div>
-
-      {/* Liste */}
-      {items.length === 0 ? (
-        <p className="text-sm text-gray-400">Aucun élément. Commencez par en ajouter un.</p>
-      ) : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center justify-between border border-gray-100 rounded-lg px-4 py-3 hover:bg-gray-50">
-              <button
-                onClick={() => handleItemClick(item)}
-                className={`text-sm font-medium text-left flex-1 ${view.level !== 'grades' ? 'hover:text-blue-600' : 'cursor-default'}`}
-              >
-                {item.name}
-                {'value' in item && <span className="ml-2 text-gray-400 font-normal">{item.value} / 20</span>}
-                {'coefficient' in item && view.level === 'subjects' && <span className="ml-2 text-gray-400 font-normal text-xs">coeff {item.coefficient}</span>}
-              </button>
-              <button onClick={() => handleDelete(item.id)} className="text-gray-300 hover:text-red-500 text-lg ml-4">×</button>
-            </div>
-          ))}
+          {view.level === 'subjects' && (
+            <input
+              type="number"
+              placeholder="Coefficient"
+              value={coeffInput}
+              onChange={(e) => setCoeffInput(e.target.value)}
+              min="0"
+              className="w-28 bg-surface-container-low border border-outline-variant/20 rounded-sm px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors"
+            />
+          )}
+          {view.level === 'grades' && (
+            <>
+              <input
+                type="number"
+                placeholder="Note /20"
+                value={coeffInput}
+                onChange={(e) => setCoeffInput(e.target.value)}
+                min="0"
+                max="20"
+                className="w-28 bg-surface-container-low border border-outline-variant/20 rounded-sm px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors"
+              />
+              <input
+                type="number"
+                placeholder="Coefficient"
+                value={gradeCoeff}
+                onChange={(e) => setGradeCoeff(e.target.value)}
+                min="0"
+                className="w-28 bg-surface-container-low border border-outline-variant/20 rounded-sm px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors"
+              />
+            </>
+          )}
+          <button onClick={handleAdd} className="btn-primary px-5 py-2.5 text-sm flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-base">add</span>
+            Ajouter
+          </button>
         </div>
-      )}
+      </div>
+
+      {/* List */}
+      <div className="bg-surface-container-lowest rounded-lg card-shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-surface-container flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary text-lg">{levelIcon}</span>
+          <h3 className="font-semibold text-sm">{title}</h3>
+          <span className="ml-auto text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
+            {items.length}
+          </span>
+        </div>
+
+        {items.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <span className="material-symbols-outlined text-4xl text-on-surface-variant/20 mb-3 block">inbox</span>
+            <p className="text-sm text-on-surface-variant">Aucun élément. Commencez par en ajouter un.</p>
+          </div>
+        ) : (
+          <div>
+            {items.map((item, i) => (
+              <div
+                key={item.id}
+                className={`flex items-center px-6 py-4 transition-colors ${i % 2 === 1 ? 'bg-surface-container-low/40' : ''} hover:bg-surface-container group`}
+              >
+                <button
+                  onClick={() => isClickable && handleItemClick(item)}
+                  className={`flex-1 text-left flex items-center gap-3 ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+                >
+                  <span className="material-symbols-outlined text-on-surface-variant/40 text-lg group-hover:text-primary transition-colors">
+                    {levelIcon}
+                  </span>
+                  <span className="text-sm font-medium text-on-surface">{item.name}</span>
+                  {'value' in item && (
+                    <span className="font-cursive text-lg text-primary ml-1">{item.value}</span>
+                  )}
+                  {'coefficient' in item && (view.level === 'subjects' || view.level === 'grades') && (
+                    <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full ml-1">
+                      coeff {item.coefficient}
+                    </span>
+                  )}
+                  {isClickable && (
+                    <span className="material-symbols-outlined text-sm text-on-surface-variant/30 group-hover:text-primary transition-colors ml-auto mr-2">
+                      chevron_right
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="text-on-surface-variant/20 hover:text-error transition-colors ml-2 opacity-0 group-hover:opacity-100"
+                >
+                  <span className="material-symbols-outlined text-lg">delete</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

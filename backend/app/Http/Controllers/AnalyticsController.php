@@ -59,9 +59,61 @@ class AnalyticsController extends Controller
 
         $bestYear = $yearsData->sortByDesc('average')->first();
 
+        $globalAverage = $yearsData->isNotEmpty()
+            ? round($yearsData->avg('average'), 2)
+            : null;
+
+        // Best semester across all years
+        $bestSemester = null;
+        $bestSemesterAvg = -1;
+        foreach ($years as $year) {
+            foreach ($year->semesters as $semester) {
+                $avg = $this->semesterAverage($semester);
+                if ($avg > $bestSemesterAvg) {
+                    $bestSemesterAvg = $avg;
+                    $bestSemester = ['id' => $semester->id, 'name' => $semester->name, 'average' => $avg];
+                }
+            }
+        }
+
+        // Best subject across all years
+        $bestSubject = null;
+        $bestSubjectAvg = -1;
+        foreach ($years as $year) {
+            foreach ($year->semesters as $semester) {
+                foreach ($semester->subjects as $subject) {
+                    $avg = $this->subjectAverage($subject);
+                    if ($avg > $bestSubjectAvg) {
+                        $bestSubjectAvg = $avg;
+                        $bestSubject = ['id' => $subject->id, 'name' => $subject->name, 'average' => $avg];
+                    }
+                }
+            }
+        }
+
+        // Best grade across all years
+        $bestGrade = null;
+        $bestGradeValue = -1;
+        foreach ($years as $year) {
+            foreach ($year->semesters as $semester) {
+                foreach ($semester->subjects as $subject) {
+                    foreach ($subject->grades as $grade) {
+                        if ($grade->value > $bestGradeValue) {
+                            $bestGradeValue = $grade->value;
+                            $bestGrade = ['id' => $grade->id, 'name' => $grade->name, 'value' => $grade->value];
+                        }
+                    }
+                }
+            }
+        }
+
         return response()->json([
+            'average' => $globalAverage,
             'years' => $yearsData->values(),
             'best_year' => $bestYear,
+            'best_semester' => $bestSemester,
+            'best_subject' => $bestSubject,
+            'best_grade' => $bestGrade,
         ]);
     }
 
