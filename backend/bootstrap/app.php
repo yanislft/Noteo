@@ -15,16 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('api/*') ? null : '/');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $e, Request $request) {
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'error' => get_class($e),
-                    'message' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ], $e instanceof AuthenticationException ? 401 : 500);
+                return response()->json(['message' => 'Unauthenticated.'], 401);
             }
         });
     })->create();
