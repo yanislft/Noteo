@@ -1,0 +1,3 @@
+[variables]
+NODE_VERSION = "20"
+PHP_VERSION = "8.3"
