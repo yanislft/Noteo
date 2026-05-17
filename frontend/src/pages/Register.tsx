@@ -3,6 +3,7 @@ import { useNavigate, Link, Navigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { register } from '../api/auth';
 import { useAuthStore } from '../store/authStore';
+import { getApiError } from '../api/errors';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ export default function Register() {
     try {
       await register(form);
       navigate('/verify-email', { state: { email: form.email } });
-    } catch {
-      setError("Une erreur est survenue lors de l'inscription");
+    } catch (err) {
+      setError(getApiError(err, "Une erreur est survenue lors de l'inscription"));
     }
   };
 

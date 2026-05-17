@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { updateProfile } from '../api/auth';
+import { getApiError } from '../api/errors';
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();
@@ -26,9 +27,8 @@ export default function Profile() {
       const updated = await updateProfile(info);
       setUser(updated);
       setInfoStatus({ type: 'success', message: 'Informations mises à jour avec succès.' });
-    } catch (err: any) {
-      const msg = err?.response?.data?.errors?.email?.[0] ?? "Une erreur est survenue.";
-      setInfoStatus({ type: 'error', message: msg });
+    } catch (err) {
+      setInfoStatus({ type: 'error', message: getApiError(err) });
     } finally {
       setInfoLoading(false);
     }
@@ -46,9 +46,8 @@ export default function Profile() {
       await updateProfile({ ...info, ...pwd });
       setPwd({ current_password: '', password: '', password_confirmation: '' });
       setPwdStatus({ type: 'success', message: 'Mot de passe modifié avec succès.' });
-    } catch (err: any) {
-      const msg = err?.response?.data?.errors?.current_password?.[0] ?? "Une erreur est survenue.";
-      setPwdStatus({ type: 'error', message: msg });
+    } catch (err) {
+      setPwdStatus({ type: 'error', message: getApiError(err) });
     } finally {
       setPwdLoading(false);
     }

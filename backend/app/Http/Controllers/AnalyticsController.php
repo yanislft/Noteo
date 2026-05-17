@@ -21,7 +21,7 @@ class AnalyticsController extends Controller
 
     private function semesterAverage(Semester $semester): float
     {
-        $subjects = $semester->subjects()->with('grades')->get();
+        $subjects = $semester->relationLoaded('subjects') ? $semester->subjects : $semester->subjects()->with('grades')->get();
         if ($subjects->isEmpty()) return 0;
 
         $total = 0;
@@ -38,7 +38,7 @@ class AnalyticsController extends Controller
 
     private function yearAverage(Year $year): float
     {
-        $semesters = $year->semesters()->with('subjects.grades')->get();
+        $semesters = $year->relationLoaded('semesters') ? $year->semesters : $year->semesters()->with('subjects.grades')->get();
         if ($semesters->isEmpty()) return 0;
 
         $total = $semesters->sum(fn($s) => $this->semesterAverage($s));

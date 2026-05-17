@@ -24,8 +24,8 @@ class SubjectController extends Controller
         })->where('id', $semesterId)->firstOrFail();
 
         $request->validate([
-            'name' => 'required|string',
-            'coefficient' => 'numeric|min:0',
+            'name' => 'required|string|max:255',
+            'coefficient' => 'numeric|min:0|max:100',
         ]);
 
         $subject = Subject::create([
@@ -35,6 +35,22 @@ class SubjectController extends Controller
         ]);
 
         return response()->json($subject, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $subject = Subject::whereHas('semester.year', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->where('id', $id)->firstOrFail();
+
+        $request->validate([
+            'coefficient' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $subject->coefficient = $request->coefficient;
+        $subject->save();
+
+        return response()->json($subject);
     }
 
     public function destroy($id)

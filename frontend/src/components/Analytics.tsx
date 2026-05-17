@@ -138,7 +138,7 @@ export default function Analytics() {
       setSubjects([]);
       fetchGlobalLineData(years);
     }
-  }, [selectedYear]);
+  }, [selectedYear, years]);
 
   useEffect(() => {
     if (selectedSemester) {

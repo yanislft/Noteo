@@ -9,6 +9,8 @@ import Dashboard from './pages/Dashboard';
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import NotFound from './pages/NotFound';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, user, hydrated } = useAuthStore();
@@ -30,6 +32,7 @@ function App() {
   }, []);
 
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -43,8 +46,10 @@ function App() {
             <Dashboard />
           </PrivateRoute>
         } />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

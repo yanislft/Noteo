@@ -14,7 +14,7 @@ class YearController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|string']);
+        $request->validate(['name' => 'required|string|max:255']);
 
         $year = Year::create([
             'user_id' => auth()->id(),

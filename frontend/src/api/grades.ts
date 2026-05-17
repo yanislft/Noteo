@@ -11,6 +11,11 @@ export const createGrade = async (subjectId: number, data: { name: string; value
   return response.data;
 };
 
+export const updateGrade = async (id: number, data: { value?: number; coefficient?: number }) => {
+  const response = await api.patch<Grade>(`/grades/${id}`, data);
+  return response.data;
+};
+
 export const deleteGrade = async (id: number) => {
   await api.delete(`/grades/${id}`);
 };

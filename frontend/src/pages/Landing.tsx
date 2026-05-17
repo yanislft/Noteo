@@ -74,12 +74,18 @@ export default function Landing() {
     setAverage(null);
   };
 
+  const [calcError, setCalcError] = useState('');
+
   const calculate = () => {
+    setCalcError('');
     let total = 0;
     let totalCoeff = 0;
     for (const s of subjects) {
       const avg = subjectAverage(s);
-      if (avg === null) return;
+      if (avg === null) {
+        setCalcError('Veuillez remplir toutes les notes avant de calculer.');
+        return;
+      }
       const coeff = parseFloat(s.coefficient) || 1;
       total += avg * coeff;
       totalCoeff += coeff;
@@ -288,6 +294,13 @@ export default function Landing() {
               Calculer
             </button>
           </div>
+
+          {calcError && (
+            <p className="mt-4 text-sm text-error flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-base">error</span>
+              {calcError}
+            </p>
+          )}
 
           {average !== null && (
             <div className="mt-8 text-right">

@@ -11,6 +11,11 @@ export const createSubject = async (semesterId: number, data: { name: string; co
   return response.data;
 };
 
+export const updateSubjectCoeff = async (id: number, coefficient: number) => {
+  const response = await api.patch<Subject>(`/subjects/${id}`, { coefficient });
+  return response.data;
+};
+
 export const deleteSubject = async (id: number) => {
   await api.delete(`/subjects/${id}`);
 };

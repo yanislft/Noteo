@@ -16,10 +16,10 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'firstname' => 'required|string',
+            'name' => 'required|string|max:255',
+            'firstname' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            'password' => 'required|min:8',
         ]);
 
         $user = User::create([
@@ -69,7 +69,7 @@ class AuthController extends Controller
         $request->validate([
             'token'                 => 'required',
             'email'                 => 'required|email',
-            'password'              => 'required|min:6|confirmed',
+            'password'              => 'required|min:8|confirmed',
         ]);
 
         $status = Password::reset(
@@ -120,7 +120,7 @@ class AuthController extends Controller
         ]);
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Identifiants incorrects'], 401);
+            return response()->json(['message' => 'Identifiants incorrects'], 422);
         }
 
         return response()->json(['token' => $token, 'user' => auth()->user()]);
@@ -142,14 +142,14 @@ class AuthController extends Controller
         $user = auth()->user();
 
         $rules = [
-            'name'      => 'required|string',
-            'firstname' => 'required|string',
+            'name'      => 'required|string|max:255',
+            'firstname' => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,' . $user->id,
         ];
 
         if ($request->filled('current_password')) {
             $rules['current_password']    = 'required';
-            $rules['password']            = 'required|min:6|confirmed';
+            $rules['password']            = 'required|min:8|confirmed';
         }
 
         $request->validate($rules);
@@ -161,10 +161,21 @@ class AuthController extends Controller
             $user->password = Hash::make($request->password);
         }
 
+        $emailChanged = $request->email !== $user->email;
+
         $user->name      = $request->name;
         $user->firstname = $request->firstname;
         $user->email     = $request->email;
+
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
 
         return response()->json($user);
     }

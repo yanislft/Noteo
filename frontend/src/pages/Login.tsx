@@ -3,6 +3,7 @@ import { useNavigate, Link, Navigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { login } from '../api/auth';
 import { useAuthStore } from '../store/authStore';
+import { getApiError } from '../api/errors';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -26,8 +27,8 @@ export default function Login() {
       } else {
         navigate('/dashboard');
       }
-    } catch {
-      setError('Email ou mot de passe incorrect');
+    } catch (err) {
+      setError(getApiError(err, 'Email ou mot de passe incorrect'));
     }
   };
 
@@ -122,12 +123,8 @@ export default function Login() {
                 </button>
               </div>
 
-              {/* Remember / Forgot */}
-              <div className="flex items-center justify-between text-xs">
-                <label className="flex items-center gap-2 cursor-pointer group">
-                  <input type="checkbox" className="w-4 h-4 rounded border-outline-variant accent-primary" />
-                  <span className="text-on-surface-variant group-hover:text-primary transition-colors">Rester connecté</span>
-                </label>
+              {/* Forgot */}
+              <div className="flex justify-end text-xs">
                 <Link to="/forgot-password" className="text-secondary font-semibold hover:underline decoration-dotted underline-offset-4">
                   Mot de passe oublié ?
                 </Link>

@@ -24,9 +24,9 @@ class GradeController extends Controller
         })->where('id', $subjectId)->firstOrFail();
 
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'value' => 'required|numeric|min:0|max:20',
-            'coefficient' => 'numeric|min:0',
+            'coefficient' => 'numeric|min:0|max:100',
         ]);
 
         $grade = Grade::create([
@@ -37,6 +37,22 @@ class GradeController extends Controller
         ]);
 
         return response()->json($grade, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $grade = Grade::whereHas('subject.semester.year', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->where('id', $id)->firstOrFail();
+
+        $request->validate([
+            'value' => 'numeric|min:0|max:20',
+            'coefficient' => 'numeric|min:0|max:100',
+        ]);
+
+        $grade->fill($request->only(['value', 'coefficient']))->save();
+
+        return response()->json($grade);
     }
 
     public function destroy($id)

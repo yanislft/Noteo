@@ -5,8 +5,9 @@ import { resendVerification } from '../api/auth';
 
 export default function VerifyEmail() {
   const location = useLocation();
-  const email = (location.state as { email?: string })?.email ?? '';
+  const stateEmail = (location.state as { email?: string })?.email ?? '';
 
+  const [email, setEmail] = useState(stateEmail);
   const [cooldown, setCooldown] = useState(0);
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ export default function VerifyEmail() {
   }, [cooldown]);
 
   const handleResend = async () => {
-    if (!email || loading || cooldown > 0) return;
+    if (!email.trim() || loading || cooldown > 0) return;
     setLoading(true);
     setStatus(null);
     try {
@@ -62,18 +63,32 @@ export default function VerifyEmail() {
             {/* Header */}
             <div className="text-center mb-8">
               <h1 className="font-cursive text-4xl text-primary mb-3">Vérifiez votre email</h1>
-              <p className="text-sm text-on-surface-variant leading-relaxed">
-                Un lien de confirmation a été envoyé à{' '}
-                {email && <span className="font-semibold text-on-surface">{email}</span>}.
-                {!email && 'votre adresse email.'}
-                <br />Cliquez dessus pour activer votre compte.
-              </p>
+              {email ? (
+                <p className="text-sm text-on-surface-variant leading-relaxed">
+                  Un lien de confirmation a été envoyé à{' '}
+                  <span className="font-semibold text-on-surface">{email}</span>.
+                  <br />Cliquez dessus pour activer votre compte.
+                </p>
+              ) : (
+                <p className="text-sm text-on-surface-variant">Entrez votre email pour recevoir un lien de confirmation.</p>
+              )}
             </div>
 
             {status && (
               <div className={`mb-6 px-4 py-3 rounded-sm text-sm ${status.type === 'success' ? 'bg-primary/10 text-primary' : 'bg-error-container text-on-error-container'}`}>
                 {status.message}
               </div>
+            )}
+
+            {/* Email input if no state */}
+            {!stateEmail && (
+              <input
+                type="email"
+                placeholder="Votre adresse email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-sm px-3 py-2.5 text-sm focus:outline-none focus:border-primary transition-colors mb-4"
+              />
             )}
 
             {/* Tips */}
@@ -89,16 +104,14 @@ export default function VerifyEmail() {
             </div>
 
             {/* Resend */}
-            {email && (
-              <button
-                onClick={handleResend}
-                disabled={loading || cooldown > 0}
-                className="w-full btn-primary py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="material-symbols-outlined text-base">send</span>
-                {cooldown > 0 ? `Renvoyer dans ${cooldown}s` : loading ? 'Envoi…' : "Renvoyer l'email"}
-              </button>
-            )}
+            <button
+              onClick={handleResend}
+              disabled={!email || loading || cooldown > 0}
+              className="w-full btn-primary py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="material-symbols-outlined text-base">send</span>
+              {cooldown > 0 ? `Renvoyer dans ${cooldown}s` : loading ? 'Envoi…' : "Renvoyer l'email"}
+            </button>
 
             {/* Footer */}
             <div className="mt-6 text-center">

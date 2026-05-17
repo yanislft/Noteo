@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import type { Year, Semester, Subject, Grade } from '../types';
 import { getYears, createYear, deleteYear } from '../api/years';
 import { getSemesters, createSemester, deleteSemester } from '../api/semesters';
-import { getSubjects, createSubject, deleteSubject } from '../api/subjects';
-import { getGrades, createGrade, deleteGrade } from '../api/grades';
+import { getSubjects, createSubject, updateSubjectCoeff, deleteSubject } from '../api/subjects';
+import { getGrades, createGrade, updateGrade, deleteGrade } from '../api/grades';
+import { getApiError } from '../api/errors';
 
 type View =
   | { level: 'years' }
@@ -20,6 +21,12 @@ export default function Management() {
   const [input, setInput] = useState('');
   const [coeffInput, setCoeffInput] = useState('1');
   const [gradeCoeff, setGradeCoeff] = useState('1');
+  const [error, setError] = useState('');
+  const [editingSubjectId, setEditingSubjectId] = useState<number | null>(null);
+  const [editCoeff, setEditCoeff] = useState('');
+  const [editingGradeId, setEditingGradeId] = useState<number | null>(null);
+  const [editGradeValue, setEditGradeValue] = useState('');
+  const [editGradeCoeff, setEditGradeCoeff] = useState('');
 
   useEffect(() => {
     if (view.level === 'years') getYears().then(setYears);
@@ -29,33 +36,73 @@ export default function Management() {
     setInput('');
     setCoeffInput('1');
     setGradeCoeff('1');
+    setError('');
+    setEditingSubjectId(null);
+    setEditingGradeId(null);
   }, [view]);
 
   const handleAdd = async () => {
     if (!input.trim()) return;
-    if (view.level === 'years') {
-      const year = await createYear(input);
-      setYears([...years, year]);
-    } else if (view.level === 'semesters') {
-      const semester = await createSemester(view.year.id, input);
-      setSemesters([...semesters, semester]);
-    } else if (view.level === 'subjects') {
-      const subject = await createSubject(view.semester.id, { name: input, coefficient: parseFloat(coeffInput) || 1 });
-      setSubjects([...subjects, subject]);
-    } else if (view.level === 'grades') {
-      const grade = await createGrade(view.subject.id, { name: input, value: parseFloat(coeffInput), coefficient: parseFloat(gradeCoeff) || 1 });
-      setGrades([...grades, grade]);
+    setError('');
+    try {
+      if (view.level === 'years') {
+        const year = await createYear(input);
+        setYears([...years, year]);
+      } else if (view.level === 'semesters') {
+        const semester = await createSemester(view.year.id, input);
+        setSemesters([...semesters, semester]);
+      } else if (view.level === 'subjects') {
+        const subject = await createSubject(view.semester.id, { name: input, coefficient: parseFloat(coeffInput) || 1 });
+        setSubjects([...subjects, subject]);
+      } else if (view.level === 'grades') {
+        const grade = await createGrade(view.subject.id, { name: input, value: parseFloat(coeffInput), coefficient: parseFloat(gradeCoeff) || 1 });
+        setGrades([...grades, grade]);
+      }
+      setInput('');
+      setCoeffInput('1');
+      setGradeCoeff('1');
+    } catch (err) {
+      setError(getApiError(err, 'Une erreur est survenue. Vérifiez les valeurs saisies.'));
     }
-    setInput('');
-    setCoeffInput('1');
-    setGradeCoeff('1');
+  };
+
+  const handleUpdateCoeff = async (id: number) => {
+    const val = parseFloat(editCoeff);
+    if (isNaN(val) || val < 0) return;
+    setError('');
+    try {
+      const updated = await updateSubjectCoeff(id, val);
+      setSubjects(subjects.map((s) => (s.id === id ? updated : s)));
+      setEditingSubjectId(null);
+    } catch (err) {
+      setError(getApiError(err, 'Impossible de modifier le coefficient.'));
+    }
+  };
+
+  const handleUpdateGrade = async (id: number) => {
+    const val = parseFloat(editGradeValue);
+    const coeff = parseFloat(editGradeCoeff);
+    if (isNaN(val) || val < 0 || val > 20 || isNaN(coeff) || coeff < 0) return;
+    setError('');
+    try {
+      const updated = await updateGrade(id, { value: val, coefficient: coeff });
+      setGrades(grades.map((g) => (g.id === id ? updated : g)));
+      setEditingGradeId(null);
+    } catch (err) {
+      setError(getApiError(err, 'Impossible de modifier la note.'));
+    }
   };
 
   const handleDelete = async (id: number) => {
-    if (view.level === 'years') { await deleteYear(id); setYears(years.filter((y) => y.id !== id)); }
-    else if (view.level === 'semesters') { await deleteSemester(id); setSemesters(semesters.filter((s) => s.id !== id)); }
-    else if (view.level === 'subjects') { await deleteSubject(id); setSubjects(subjects.filter((s) => s.id !== id)); }
-    else if (view.level === 'grades') { await deleteGrade(id); setGrades(grades.filter((g) => g.id !== id)); }
+    setError('');
+    try {
+      if (view.level === 'years') { await deleteYear(id); setYears(years.filter((y) => y.id !== id)); }
+      else if (view.level === 'semesters') { await deleteSemester(id); setSemesters(semesters.filter((s) => s.id !== id)); }
+      else if (view.level === 'subjects') { await deleteSubject(id); setSubjects(subjects.filter((s) => s.id !== id)); }
+      else if (view.level === 'grades') { await deleteGrade(id); setGrades(grades.filter((g) => g.id !== id)); }
+    } catch (err) {
+      setError(getApiError(err, 'Impossible de supprimer cet élément.'));
+    }
   };
 
   const breadcrumb = () => {
@@ -172,6 +219,14 @@ export default function Management() {
         </div>
       </div>
 
+      {/* Error */}
+      {error && (
+        <div className="px-4 py-3 bg-error-container text-on-error-container rounded-sm text-sm flex items-center gap-2">
+          <span className="material-symbols-outlined text-base">error</span>
+          {error}
+        </div>
+      )}
+
       {/* List */}
       <div className="bg-surface-container-lowest rounded-lg card-shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-container flex items-center gap-2">
@@ -205,7 +260,7 @@ export default function Management() {
                   {'value' in item && (
                     <span className="font-cursive text-lg text-primary ml-1">{item.value}</span>
                   )}
-                  {'coefficient' in item && (view.level === 'subjects' || view.level === 'grades') && (
+                  {'coefficient' in item && view.level === 'grades' && (
                     <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full ml-1">
                       coeff {item.coefficient}
                     </span>
@@ -216,6 +271,75 @@ export default function Management() {
                     </span>
                   )}
                 </button>
+                {view.level === 'subjects' && (
+                  editingSubjectId === item.id ? (
+                    <div className="flex items-center gap-1 ml-2">
+                      <input
+                        type="number"
+                        value={editCoeff}
+                        onChange={(e) => setEditCoeff(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateCoeff(item.id); if (e.key === 'Escape') setEditingSubjectId(null); }}
+                        min="0"
+                        max="100"
+                        autoFocus
+                        className="w-20 bg-surface-container-low border border-primary rounded-sm px-2 py-1 text-sm focus:outline-none"
+                      />
+                      <button onClick={() => handleUpdateCoeff(item.id)} className="text-primary hover:text-primary/70 transition-colors">
+                        <span className="material-symbols-outlined text-lg">check</span>
+                      </button>
+                      <button onClick={() => setEditingSubjectId(null)} className="text-on-surface-variant/40 hover:text-on-surface-variant transition-colors">
+                        <span className="material-symbols-outlined text-lg">close</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => { setEditingSubjectId(item.id); setEditCoeff(String(('coefficient' in item ? item.coefficient : 1))); }}
+                      className="text-on-surface-variant/20 hover:text-primary transition-colors ml-2 opacity-0 group-hover:opacity-100 flex items-center gap-1"
+                    >
+                      <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">coeff {'coefficient' in item ? item.coefficient : ''}</span>
+                      <span className="material-symbols-outlined text-base">edit</span>
+                    </button>
+                  )
+                )}
+                {view.level === 'grades' && (
+                  editingGradeId === item.id ? (
+                    <div className="flex items-center gap-1 ml-2">
+                      <input
+                        type="number"
+                        value={editGradeValue}
+                        onChange={(e) => setEditGradeValue(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateGrade(item.id); if (e.key === 'Escape') setEditingGradeId(null); }}
+                        min="0"
+                        max="20"
+                        placeholder="/20"
+                        autoFocus
+                        className="w-20 bg-surface-container-low border border-primary rounded-sm px-2 py-1 text-sm focus:outline-none"
+                      />
+                      <input
+                        type="number"
+                        value={editGradeCoeff}
+                        onChange={(e) => setEditGradeCoeff(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateGrade(item.id); if (e.key === 'Escape') setEditingGradeId(null); }}
+                        min="0"
+                        placeholder="coeff"
+                        className="w-20 bg-surface-container-low border border-primary rounded-sm px-2 py-1 text-sm focus:outline-none"
+                      />
+                      <button onClick={() => handleUpdateGrade(item.id)} className="text-primary hover:text-primary/70 transition-colors">
+                        <span className="material-symbols-outlined text-lg">check</span>
+                      </button>
+                      <button onClick={() => setEditingGradeId(null)} className="text-on-surface-variant/40 hover:text-on-surface-variant transition-colors">
+                        <span className="material-symbols-outlined text-lg">close</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => { setEditingGradeId(item.id); setEditGradeValue(String('value' in item ? item.value : '')); setEditGradeCoeff(String('coefficient' in item ? item.coefficient : 1)); }}
+                      className="text-on-surface-variant/20 hover:text-primary transition-colors ml-2 opacity-0 group-hover:opacity-100"
+                    >
+                      <span className="material-symbols-outlined text-base">edit</span>
+                    </button>
+                  )
+                )}
                 <button
                   onClick={() => handleDelete(item.id)}
                   className="text-on-surface-variant/20 hover:text-error transition-colors ml-2 opacity-0 group-hover:opacity-100"

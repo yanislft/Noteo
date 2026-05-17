@@ -19,7 +19,7 @@ class SemesterController extends Controller
     {
         $year = Year::where('id', $yearId)->where('user_id', auth()->id())->firstOrFail();
 
-        $request->validate(['name' => 'required|string']);
+        $request->validate(['name' => 'required|string|max:255']);
 
         $semester = Semester::create([
             'year_id' => $year->id,

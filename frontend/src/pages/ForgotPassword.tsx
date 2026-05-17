@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { forgotPassword } from '../api/auth';
@@ -9,6 +9,12 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || cooldown > 0) return;
@@ -16,13 +22,7 @@ export default function ForgotPassword() {
     try {
       await forgotPassword(email);
       setSent(true);
-      let c = 60;
-      setCooldown(c);
-      const timer = setInterval(() => {
-        c -= 1;
-        setCooldown(c);
-        if (c <= 0) clearInterval(timer);
-      }, 1000);
+      setCooldown(60);
     } finally {
       setLoading(false);
     }
