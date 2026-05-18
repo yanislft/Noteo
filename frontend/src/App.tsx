@@ -13,7 +13,7 @@ import NotFound from './pages/NotFound';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { token, user, hydrated } = useAuthStore();
+  const { token, hydrated } = useAuthStore();
   if (!hydrated) return null;
   if (!token) return <Navigate to="/login" />;
   // if (user && !user.email_verified_at) return <Navigate to="/verify-email" />;
