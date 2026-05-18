@@ -19,7 +19,7 @@ export default function Register() {
     setError('');
     try {
       await register(form);
-      navigate('/verify-email', { state: { email: form.email } });
+      navigate('/login');
     } catch (err) {
       setError(getApiError(err, "Une erreur est survenue lors de l'inscription"));
     }
