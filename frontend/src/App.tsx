@@ -16,7 +16,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, user, hydrated } = useAuthStore();
   if (!hydrated) return null;
   if (!token) return <Navigate to="/login" />;
-  if (user && !user.email_verified_at) return <Navigate to="/verify-email" />;
+  // if (user && !user.email_verified_at) return <Navigate to="/verify-email" />;
   return <>{children}</>;
 };
 
