@@ -29,7 +29,11 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Exception $e) {
+            // Email sending failed, but account is created
+        }
 
         return response()->json(['message' => 'Vérifiez votre email pour activer votre compte.', 'user' => $user], 201);
     }
