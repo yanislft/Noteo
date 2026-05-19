@@ -9,6 +9,10 @@ class ApiCors
 {
     public function handle(Request $request, Closure $next)
     {
+        if (!$request->is('api/*')) {
+            return $next($request);
+        }
+
         $origin = env('FRONTEND_URL', 'http://localhost:5173');
 
         if ($request->getMethod() === 'OPTIONS') {

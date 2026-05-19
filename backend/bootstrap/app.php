@@ -15,9 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(ApiCors::class);
         $middleware->trustProxies(at: '*');
         $middleware->redirectGuestsTo(fn (Request $request) => $request->is('api/*') ? null : '/');
-        $middleware->prependToGroup('api', ApiCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
