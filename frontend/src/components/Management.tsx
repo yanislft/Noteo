@@ -320,7 +320,7 @@ export default function Management() {
                   ) : (
                     <button
                       onClick={() => { setEditingSubjectId(item.id); setEditCoeff(String(('coefficient' in item ? item.coefficient : 1))); }}
-                      className="text-on-surface-variant/50 hover:text-primary transition-colors ml-2 md:opacity-0 md:group-hover:opacity-100 flex items-center gap-1"
+                      className="text-on-surface-variant/40 hover:text-primary transition-colors ml-2 flex items-center gap-1"
                     >
                       <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">coeff {'coefficient' in item ? item.coefficient : ''}</span>
                       <span className="material-symbols-outlined text-base">edit</span>
@@ -360,7 +360,7 @@ export default function Management() {
                   ) : (
                     <button
                       onClick={() => { setEditingGradeId(item.id); setEditGradeValue(String('value' in item ? item.value : '')); setEditGradeCoeff(String('coefficient' in item ? item.coefficient : 1)); }}
-                      className="text-on-surface-variant/50 hover:text-primary transition-colors ml-2 md:opacity-0 md:group-hover:opacity-100"
+                      className="text-on-surface-variant/40 hover:text-primary transition-colors ml-2"
                     >
                       <span className="material-symbols-outlined text-base">edit</span>
                     </button>
@@ -368,7 +368,7 @@ export default function Management() {
                 )}
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="text-on-surface-variant/50 hover:text-error transition-colors ml-2 md:opacity-0 md:group-hover:opacity-100"
+                  className="text-on-surface-variant/40 hover:text-error transition-colors ml-2"
                 >
                   <span className="material-symbols-outlined text-lg">delete</span>
                 </button>
