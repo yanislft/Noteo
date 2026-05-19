@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useAuthStore } from '../store/authStore';
 
 interface CalcGrade {
   value: string;
@@ -29,6 +30,7 @@ function subjectAverage(subject: CalcSubject): number | null {
 }
 
 export default function Landing() {
+  const { token, user } = useAuthStore();
   const [subjects, setSubjects] = useState<CalcSubject[]>([
     { name: 'Mathématiques', coefficient: '4', grades: [{ value: '14.5', coefficient: '1' }] },
     { name: 'Littérature', coefficient: '3', grades: [{ value: '12', coefficient: '1' }] },
@@ -97,6 +99,16 @@ export default function Landing() {
     <div className="min-h-screen bg-background text-on-surface font-sans paper-grain">
 
       <Navbar />
+
+      {token && user && (
+        <div className="bg-primary text-on-primary py-3 px-6 flex items-center justify-center gap-3 flex-wrap text-sm">
+          <span>Bonjour {user.firstname}, vous êtes connecté.</span>
+          <Link to="/dashboard" className="font-semibold underline underline-offset-2 flex items-center gap-1">
+            Accéder au tableau de bord
+            <span className="material-symbols-outlined text-base">arrow_forward</span>
+          </Link>
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <section className="max-w-7xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-2 items-center gap-16">

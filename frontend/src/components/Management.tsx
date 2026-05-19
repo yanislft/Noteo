@@ -238,10 +238,36 @@ export default function Management() {
         </div>
 
         {items.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <span className="material-symbols-outlined text-4xl text-on-surface-variant/20 mb-3 block">inbox</span>
-            <p className="text-sm text-on-surface-variant">Aucun élément. Commencez par en ajouter un.</p>
-          </div>
+          view.level === 'years' ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+              <span className="material-symbols-outlined text-5xl text-primary/40 mb-4">school</span>
+              <h3 className="text-lg font-semibold text-on-surface mb-2">Bienvenue sur vos notes</h3>
+              <p className="text-sm text-on-surface-variant mb-8 max-w-sm">
+                Commencez par ajouter votre première année universitaire, puis ajoutez vos semestres, matières et notes.
+              </p>
+              <div className="flex flex-col gap-4 text-left w-full max-w-xs">
+                {[
+                  { label: 'Ajouter une année', desc: 'Ex : 2024-2025', icon: 'add_circle' },
+                  { label: 'Ajouter un semestre', desc: 'Ex : Semestre 1', icon: 'calendar_month' },
+                  { label: 'Ajouter une matière', desc: 'Avec son coefficient', icon: 'book' },
+                  { label: 'Ajouter vos notes', desc: 'Et suivre vos moyennes', icon: 'grade' },
+                ].map(({ label, desc, icon }, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-primary/60">{icon}</span>
+                    <div>
+                      <p className="text-sm font-medium text-on-surface">{label}</p>
+                      <p className="text-xs text-on-surface-variant">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="px-6 py-12 text-center">
+              <span className="material-symbols-outlined text-4xl text-on-surface-variant/20 mb-3 block">inbox</span>
+              <p className="text-sm text-on-surface-variant">Aucun élément. Commencez par en ajouter un.</p>
+            </div>
+          )
         ) : (
           <div>
             {items.map((item, i) => (
@@ -294,7 +320,7 @@ export default function Management() {
                   ) : (
                     <button
                       onClick={() => { setEditingSubjectId(item.id); setEditCoeff(String(('coefficient' in item ? item.coefficient : 1))); }}
-                      className="text-on-surface-variant/20 hover:text-primary transition-colors ml-2 opacity-0 group-hover:opacity-100 flex items-center gap-1"
+                      className="text-on-surface-variant/50 hover:text-primary transition-colors ml-2 md:opacity-0 md:group-hover:opacity-100 flex items-center gap-1"
                     >
                       <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">coeff {'coefficient' in item ? item.coefficient : ''}</span>
                       <span className="material-symbols-outlined text-base">edit</span>
@@ -334,7 +360,7 @@ export default function Management() {
                   ) : (
                     <button
                       onClick={() => { setEditingGradeId(item.id); setEditGradeValue(String('value' in item ? item.value : '')); setEditGradeCoeff(String('coefficient' in item ? item.coefficient : 1)); }}
-                      className="text-on-surface-variant/20 hover:text-primary transition-colors ml-2 opacity-0 group-hover:opacity-100"
+                      className="text-on-surface-variant/50 hover:text-primary transition-colors ml-2 md:opacity-0 md:group-hover:opacity-100"
                     >
                       <span className="material-symbols-outlined text-base">edit</span>
                     </button>
@@ -342,7 +368,7 @@ export default function Management() {
                 )}
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="text-on-surface-variant/20 hover:text-error transition-colors ml-2 opacity-0 group-hover:opacity-100"
+                  className="text-on-surface-variant/50 hover:text-error transition-colors ml-2 md:opacity-0 md:group-hover:opacity-100"
                 >
                   <span className="material-symbols-outlined text-lg">delete</span>
                 </button>

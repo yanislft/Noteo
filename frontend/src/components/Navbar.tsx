@@ -16,7 +16,7 @@ export default function Navbar() {
         <div className="flex gap-1 md:gap-3 items-center justify-end">
           {user ? (
             <>
-              <Link to="/dashboard" className="hidden md:inline text-sm text-on-surface-variant hover:text-primary transition-colors font-medium px-3 md:px-4 py-2">
+              <Link to="/dashboard" className="text-xs md:text-sm text-on-surface-variant hover:text-primary transition-colors font-medium px-2 md:px-4 py-2 truncate max-w-[100px] md:max-w-none">
                 Tableau de bord
               </Link>
               <Link to="/dashboard" className="flex items-center gap-2 btn-primary text-sm px-4 md:px-5 py-2">
